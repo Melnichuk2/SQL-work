@@ -1,0 +1,148 @@
+/*1. Вивести статистику: загальна кількість всіх книг, їх вартість, їх середню вартість, мінімальну і максимальну ціну*/
+SELECT COUNT(*) AS COUNT_, 
+    SUM(Price) AS SUM_, 
+    AVG(Price) AS AVG_, 
+    MIN(Price) AS MIN_, 
+    MAX(Price) AS MAX_ FROM `lab1`;
+
+/*2. Вивести загальну кількість всіх книг без урахування книг з непроставленою ціною*/
+SELECT COUNT(*) FROM `lab1` WHERE Price is not NULL;
+
+/*3. Вивести статистику (див. 1) для книг новинка / не новинка*/
+SELECT COUNT(*) AS COUNT_, 
+    SUM(Price) AS SUM_, 
+    AVG(Price) AS AVG_, 
+    MIN(Price) AS MIN_, 
+    MAX(Price) AS MAX_,
+    New AS isNew FROM `lab1` GROUP BY New;
+
+/*4. Вивести статистику (див. 1) для книг за кожним роком видання*/
+SELECT COUNT(*) AS COUNT_, 
+    SUM(Price) AS SUM_, 
+    AVG(Price) AS AVG_, 
+    MIN(Price) AS MIN_, 
+    MAX(Price) AS MAX_, 
+    Date AS DATE_ FROM `lab1` GROUP BY year(Date);
+
+/*5. Змінити п.4, виключивши з статистики книги з ціною від 10 до 20*/
+SELECT COUNT(*) AS COUNT_, 
+    SUM(Price) AS SUM_, 
+    AVG(Price) AS AVG_,
+    MIN(Price) AS MIN_, 
+    MAX(Price) AS MAX_, 
+    Date AS DATE_ FROM `lab1` WHERE (Price>=10) and (Price<=20) GROUP BY year(Date);
+
+/*6. Змінити п.4. Відсортувати статистику по спадаючій кількості.*/
+SELECT COUNT(*) AS COUNT_, 
+    SUM(Price) AS SUM_, 
+    AVG(Price) AS AVG_, 
+    MIN(Price) AS MIN_, 
+    MAX(Price) AS MAX_, 
+    Date AS DATE_ FROM `lab1` GROUP BY year(Date) ORDER BY COUNT_ DESC;
+
+/*7. Вивести загальну кількість кодів книг і кодів книг що не повторюються*/
+SELECT COUNT(DISTINCT Cod ) AS Cod  FROM lab1;
+
+/*8. Вивести статистику: загальна кількість і вартість книг по першій букві її назви*/
+SELECT COUNT(*),
+    COUNT(Price),
+    left(Name,1) AS FIRSTLETTER FROM `lab1` 
+    GROUP BY FIRSTLETTER;
+
+/*9. Змінити п. 8, виключивши з статистики назви що починаються з англ. букви або з цифри.*/
+SELECT COUNT(*) AS "Name"
+FROM lab1
+WHERE Name NOT REGEXP '^[A-Za-z0-9]';
+
+/*10. Змінити п. 9 так щоб до складу статистики потрапили дані з роками більшими за 2000.*/
+SELECT COUNT(*),
+	COUNT(Price),
+	left(Name, 1) AS FIRSTLETTER FROM `lab1` WHERE year(Date) >=2000
+    GROUP BY FIRSTLETTER;
+
+/*11. Змінити п. 10. Відсортувати статистику по спадаючій перших букв назви.*/
+SELECT COUNT(*),
+	COUNT(Price),
+	left(Name, 1) AS FIRSTLETTER FROM `lab1` WHERE year(Date) >=2000
+    GROUP by FIRSTLETTER
+	ORDER BY FIRSTLETTER DESC;
+
+
+/*12. Вивести статистику (див. 1) по кожному місяцю кожного року.*/
+SELECT COUNT(*) AS COUNT_, 
+	SUM(Price) AS SUM_, 
+	AVG(Price) AS AVG_, 
+	MIN(Price) AS MIN_, 
+	MAX(Price) AS MAX_, 
+	MONTH(Date) AS MONTH_, 
+	YEAR(Date) AS YEAR_ FROM lab1
+	GROUP BY MONTH_;
+
+
+/*13. Змінити п. 12 так щоб до складу статистики не увійшли дані з незаповненими датами.*/
+SELECT COUNT(*) AS COUNT_, 
+	SUM(Price) AS SUM_, 
+	AVG(Price) AS AVG_, 
+	MIN(Price) AS MIN_, 
+	MAX(Price) AS MAX_, 
+	MONTH(Date) AS MONTH_, 
+	YEAR(Date) AS YEAR_ FROM lab1 WHERE Date is NOT NULL
+	GROUP BY MONTH_;
+
+/*14. Змінити п. 12. Фільтр по спадаючій року і зростанню місяця.*/
+SELECT COUNT(*) AS COUNT_, 
+	SUM(Price) AS SUM_, 
+	AVG(Price) AS AVG_, 
+	MIN(Price) AS MIN_, 
+	MAX(Price) AS MAX_, 
+	MONTH(Date) AS MONTH_, 
+	YEAR(Date) AS YEAR_ FROM lab1
+	GROUP BY MONTH(Date), YEAR(Date)
+	ORDER BY MONTH(Date) DESC, YEAR(Date) ASC;
+
+/*15. Вивести статистику для книг новинка / не новинка: загальна ціна, загальна ціна в грн. / Євро / руб. Колонкам запиту дати назви за змістом.*/
+SELECT COUNT(*),
+    SUM(Price) AS SUM_, 
+    Price*34.3 AS UAH,
+    Price*1.21 AS EUR, 
+    Price*100.26 AS RUB,
+    New AS NEW FROM `lab1` GROUP BY NEW;
+
+/*16. Змінити п. 15 так щоб виводилася округлена до цілого числа (дол. / Грн. / Євро / руб.) Ціна.*/
+SELECT COUNT(*),
+    SUM(Price) AS SUM_,
+    ROUND (Price*34.3, 0) AS UAH,
+    ROUND (Price*1.21, 0) AS EUR, 
+    ROUND (Price*100.26, 0) as RUB,
+    New AS NEW FROM `lab1` GROUP BY NEW	;
+
+/*17. Вивести статистику (див. 1) по видавництвах.*/
+SELECT COUNT(*) AS COUNT_, 
+    SUM(Price) AS SUM_, 
+    AVG(Price) AS AVG_, 
+    MIN(Price) AS MIN_, 
+    MAX(Price) AS MAX_,
+    producer AS PRODUCER FROM `lab1` GROUP BY PRODUCER;
+
+/*18. Вивести статистику (див. 1) за темами і видавництвами. Фільтр по видавництвам.*/
+SELECT COUNT(*) AS COUNT_, 
+    SUM(Price) AS SUM_, 
+    AVG(Price) AS AVG_,
+    MIN(Price) AS MIN_, 
+    MAX(Price) AS MAX_, 
+    producer,topic FROM lab1 
+    GROUP BY producer, topic
+    ORDER BY producer,topic;
+
+/*19. Вивести статистику (див. 1) за категоріями, темами і видавництвами. Фільтр по видавництвам, темах, категоріям.*/
+SELECT COUNT(*) AS COUNT_, 
+    SUM(price) AS SUM_, 
+    AVG(price) AS AVG_,
+    MIN(price) AS MIN_, 
+    MAX(price) AS MAX_, 
+    producer,topic,category FROM lab1 
+    GROUP BY producer, topic
+    ORDER BY producer,topic,category;	
+
+/*20. Вивести список видавництв, у яких округлена до цілого ціна однієї сторінки більше 10 копійок*/
+SELECT producer FROM lab1 WHERE ROUND(price/sides)>0.10;
